@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sistema de Gerenciamento de Tarefas - Demo</title>
+<meta name="description" content="Demo de um sistema simples de gerenciamento de tarefas (cadastrar, listar, editar, excluir)"/>
+<style>
+  :root{
+    --bg:#f7fafc; --primary:#1E3A8A; --accent:#10B981; --card:#ffffff;
+    --muted:#6b7280; font-family: Inter, Roboto, Arial, sans-serif;
+  }
+  body{margin:0;background:var(--bg);color:#111;}
+  header{background:var(--primary);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
+  header h1{font-size:18px;margin:0}
+  nav a{color:#fff;margin-left:14px;text-decoration:none;font-size:14px;opacity:.95}
+  main{padding:28px;max-width:1000px;margin:0 auto}
+  .hero{background:linear-gradient(90deg, rgba(30,58,138,0.95), rgba(16,185,129,0.95));color:#fff;padding:28px;border-radius:12px;display:flex;gap:20px;align-items:center}
+  .hero .left{flex:1}
+  .hero h2{margin:0 0 8px;font-size:22px}
+  .hero p{margin:0 0 12px;opacity:.95}
+  .btn{background:#fff;color:var(--primary);padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:18px}
+  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+  label{display:block;font-size:13px;margin-top:8px;color:var(--muted)}
+  input, textarea, select{width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1px solid #e6e6e6}
+  .list{margin-top:10px}
+  .task{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:6px;border:1px solid #f0f0f0;margin-top:8px;background:#fbfbff}
+  .task .meta{font-size:13px;color:#333}
+  .small-btn{padding:6px 8px;border-radius:6px;border:0;background:var(--primary);color:#fff;cursor:pointer;margin-left:6px}
+  footer{padding:18px;text-align:center;color:var(--muted);margin-top:22px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}.hero{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<header>
+  <h1>ToDo Lite</h1>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#func">Funcionalidades</a>
+    <a href="#app">Tela do App</a>
+    <a href="#contato">Contato</a>
+  </nav>
+</header>
+
+<main id="home">
+  <section class="hero">
+    <div class="left">
+      <h2>Sistema simples para gerenciar suas tarefas</h2>
+      <p>Cadastre, edite, exclua e visualize suas tarefas. Projeto para fins de apresentação acadêmica.</p>
+      <button class="btn" onclick="document.getElementById('app').scrollIntoView()">Experimentar</button>
+    </div>
+    <div class="right">
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='120'><rect rx='10' width='220' height='120' fill='%23ffffff' stroke='%231E3A8A' stroke-width='2'/><text x='16' y='46' font-family='Arial' font-size='16' fill='%231E3A8A'>Mockup</text></svg>" alt="mockup"/>
+    </div>
+  </section>
+
+  <section id="func" style="margin-top:18px;">
+    <div class="card">
+      <h3>Funcionalidades</h3>
+      <ul>
+        <li><strong>Cadastrar:</strong> título, descrição e prazo.</li>
+        <li><strong>Listar:</strong> visualização das tarefas.</li>
+        <li><strong>Editar:</strong> alterar título, descrição e prazo.</li>
+        <li><strong>Excluir:</strong> remover tarefa com confirmação.</li>
+        <li><strong>Salvamento automático:</strong> persistência local (simulada).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="app" style="margin-top:18px;" class="grid">
+    <div class="card">
+      <h3>Adicionar / Editar Tarefa</h3>
+      <form id="taskForm" onsubmit="return saveTask()">
+        <input type="hidden" id="editingId" value="">
+        <label>Título *</label>
+        <input id="title" required />
+        <label>Descrição</label>
+        <textarea id="desc" rows="3"></textarea>
+        <label>Prazo</label>
+        <input id="due" type="date" />
+        <div style="margin-top:12px;display:flex;justify-content:flex-end">
+          <button class="btn" type="submit">Salvar</button>
+        </div>
+      </form>
+
+      <div class="list" id="listArea">
+        <h4 style="margin-top:14px">Tarefas</h4>
+        <div id="tasks"></div>
+      </div>
+    </div>
+
+    <aside class="card">
+      <h3>Visão Rápida</h3>
+      <p class="muted">Simulação local — os dados são salvos no armazenamento local do navegador.</p>
+      <div style="margin-top:12px">
+        <button class="small-btn" onclick="seedDemo()">Popular demo</button>
+        <button class="small-btn" style="background:var(--accent)" onclick="clearAll()">Limpar</button>
+      </div>
+      <hr style="margin:12px 0"/>
+      <h4>Instruções</h4>
+      <ol style="font-size:13px;color:var(--muted)">
+        <li>Preencha o título e clique em salvar.</li>
+        <li>Edite ou exclua usando os botões ao lado de cada tarefa.</li>
+        <li>Os dados são mantidos no navegador (localStorage).</li>
+      </ol>
+    </aside>
+  </section>
+</main>
+
+<footer id="contato">
+  <div style="max-width:800px;margin:0 auto">
+    <p>Projeto acadêmico — Sistema de Gerenciamento de Tarefas • Jefferson Lima</p>
+  </div>
+</footer>
+
+<script>
+  const tasksKey = 'todo_demo_tasks';
+  function loadTasks(){ try{ return JSON.parse(localStorage.getItem(tasksKey) || '[]') }catch(e){return[]}}
+  function persist(tasks){ localStorage.setItem(tasksKey, JSON.stringify(tasks)); renderTasks() }
+  function renderTasks(){
+    const container=document.getElementById('tasks'); container.innerHTML='';
+    const tasks = loadTasks();
+    if(tasks.length===0){ container.innerHTML='<p style="color:#666">Nenhuma tarefa cadastrada</p>'; return;}
+    tasks.forEach((t,i)=>{
+      const div=document.createElement('div'); div.className='task';
+      div.innerHTML = `<div><div class="meta"><strong>${escapeHtml(t.title)}</strong> • ${escapeHtml(t.due||'sem prazo')}</div><div style="font-size:13px;color:#555">${escapeHtml(t.desc||'')}</div></div>
+        <div>
+          <button class="small-btn" onclick="editTask(${i})">Editar</button>
+          <button class="small-btn" style="background:#ef4444" onclick="deleteTask(${i})">Excluir</button>
+        </div>`;
+      container.appendChild(div);
+    });
+  }
+  function saveTask(){
+    const title=document.getElementById('title').value.trim();
+    if(!title){ alert('Título obrigatório'); return false }
+    const desc=document.getElementById('desc').value.trim();
+    const due=document.getElementById('due').value;
+    const editing = document.getElementById('editingId').value;
+    const tasks = loadTasks();
+    if(editing===''){
+      tasks.push({title,desc,due});
+    } else {
+      tasks[Number(editing)] = {title,desc,due};
+      document.getElementById('editingId').value='';
+    }
+    persist(tasks);
+    document.getElementById('taskForm').reset();
+    return false;
+  }
+  function editTask(i){
+    const tasks=loadTasks(); const t=tasks[i];
+    document.getElementById('title').value=t.title;
+    document.getElementById('desc').value=t.desc;
+    document.getElementById('due').value=t.due;
+    document.getElementById('editingId').value = i;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function deleteTask(i){
+    if(!confirm('Confirmar exclusão da tarefa?')) return;
+    const tasks=loadTasks(); tasks.splice(i,1); persist(tasks);
+  }
+  function seedDemo(){ const demo=[{title:'Estudar Arduino',desc:'Ler capítulo 3 e montar circuito',due:''},{title:'Trabalhar no projeto',desc:'Implementar cadastro',due:''}]; persist(demo) }
+  function clearAll(){ if(confirm('Limpar todas as tarefas?')){ localStorage.removeItem(tasksKey); renderTasks(); } }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])) }
+  renderTasks();
+</script>
+</body>
+</html>
