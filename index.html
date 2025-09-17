@@ -1,170 +1,313 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Sistema de Gerenciamento de Tarefas - Demo</title>
-<meta name="description" content="Demo de um sistema simples de gerenciamento de tarefas (cadastrar, listar, editar, excluir)"/>
-<style>
-  :root{
-    --bg:#f7fafc; --primary:#1E3A8A; --accent:#10B981; --card:#ffffff;
-    --muted:#6b7280; font-family: Inter, Roboto, Arial, sans-serif;
-  }
-  body{margin:0;background:var(--bg);color:#111;}
-  header{background:var(--primary);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
-  header h1{font-size:18px;margin:0}
-  nav a{color:#fff;margin-left:14px;text-decoration:none;font-size:14px;opacity:.95}
-  main{padding:28px;max-width:1000px;margin:0 auto}
-  .hero{background:linear-gradient(90deg, rgba(30,58,138,0.95), rgba(16,185,129,0.95));color:#fff;padding:28px;border-radius:12px;display:flex;gap:20px;align-items:center}
-  .hero .left{flex:1}
-  .hero h2{margin:0 0 8px;font-size:22px}
-  .hero p{margin:0 0 12px;opacity:.95}
-  .btn{background:#fff;color:var(--primary);padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
-  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:18px}
-  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
-  label{display:block;font-size:13px;margin-top:8px;color:var(--muted)}
-  input, textarea, select{width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1px solid #e6e6e6}
-  .list{margin-top:10px}
-  .task{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:6px;border:1px solid #f0f0f0;margin-top:8px;background:#fbfbff}
-  .task .meta{font-size:13px;color:#333}
-  .small-btn{padding:6px 8px;border-radius:6px;border:0;background:var(--primary);color:#fff;cursor:pointer;margin-left:6px}
-  footer{padding:18px;text-align:center;color:var(--muted);margin-top:22px}
-  @media(max-width:900px){.grid{grid-template-columns:1fr;}.hero{flex-direction:column;align-items:flex-start}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ToDo — Sistema de Gerenciamento de Tarefas</title>
+  <meta name="description" content="Sistema de Gerenciamento de Tarefas" />
+
+  <!-- Tailwind via CDN (for quick styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js for small reactivity -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <!-- Chart.js for donut chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-pb1m...==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- AOS for scroll animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <style>
+    /* small custom tweaks */
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(6px); }
+    .card { box-shadow: 0 10px 30px rgba(2,6,23,0.12); }
+    .accent-grad { background: linear-gradient(90deg,#1E3A8A,#10B981); -webkit-background-clip: text; color: transparent; }
+    /* custom scrollbar for task list */
+    .tasks-scroll::-webkit-scrollbar { width: 8px; }
+    .tasks-scroll::-webkit-scrollbar-thumb { background: rgba(30,58,138,0.35); border-radius: 8px; }
+  </style>
 </head>
-<body>
-<header>
-  <h1>ToDo Lite</h1>
-  <nav>
-    <a href="#home">Home</a>
-    <a href="#func">Funcionalidades</a>
-    <a href="#app">Tela do App</a>
-    <a href="#contato">Contato</a>
-  </nav>
-</header>
+<body class="bg-gradient-to-br from-slate-100 to-sky-50 min-h-screen font-sans">
 
-<main id="home">
-  <section class="hero">
-    <div class="left">
-      <h2>Sistema simples para gerenciar suas tarefas</h2>
-      <p>Cadastre, edite, exclua e visualize suas tarefas. Projeto para fins de apresentação acadêmica.</p>
-      <button class="btn" onclick="document.getElementById('app').scrollIntoView()">Experimentar</button>
-    </div>
-    <div class="right">
-      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='120'><rect rx='10' width='220' height='120' fill='%23ffffff' stroke='%231E3A8A' stroke-width='2'/><text x='16' y='46' font-family='Arial' font-size='16' fill='%231E3A8A'>Mockup</text></svg>" alt="mockup"/>
-    </div>
-  </section>
-
-  <section id="func" style="margin-top:18px;">
-    <div class="card">
-      <h3>Funcionalidades</h3>
-      <ul>
-        <li><strong>Cadastrar:</strong> título, descrição e prazo.</li>
-        <li><strong>Listar:</strong> visualização das tarefas.</li>
-        <li><strong>Editar:</strong> alterar título, descrição e prazo.</li>
-        <li><strong>Excluir:</strong> remover tarefa com confirmação.</li>
-        <li><strong>Salvamento automático:</strong> persistência local (simulada).</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="app" style="margin-top:18px;" class="grid">
-    <div class="card">
-      <h3>Adicionar / Editar Tarefa</h3>
-      <form id="taskForm" onsubmit="return saveTask()">
-        <input type="hidden" id="editingId" value="">
-        <label>Título *</label>
-        <input id="title" required />
-        <label>Descrição</label>
-        <textarea id="desc" rows="3"></textarea>
-        <label>Prazo</label>
-        <input id="due" type="date" />
-        <div style="margin-top:12px;display:flex;justify-content:flex-end">
-          <button class="btn" type="submit">Salvar</button>
+  <header class="py-6">
+    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- simple SVG logo -->
+        <div class="w-12 h-12 rounded-lg bg-white card flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="3" width="20" height="18" rx="3" fill="#1E3A8A"/>
+            <path d="M7 8H17" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M7 12H13" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M7 16H11" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
         </div>
-      </form>
-
-      <div class="list" id="listArea">
-        <h4 style="margin-top:14px">Tarefas</h4>
-        <div id="tasks"></div>
+        <div>
+          <div class="text-lg font-bold">ToDo <span class="text-slate-600"></span></div>
+          <div class="text-sm text-slate-500">Facilite o seu dia de forma simples</div>
+        </div>
       </div>
+
+      <nav class="hidden md:flex items-center gap-6 text-slate-600">
+        <a href="#app" class="hover:text-slate-900">Aplicação</a>
+        <a href="#func" class="hover:text-slate-900">Funcionalidades</a>
+        <a href="#demo" class="hover:text-slate-900">Demo</a>
+        <a href="#contato" class="text-white bg-gradient-to-r from-indigo-600 to-emerald-500 px-3 py-2 rounded-md shadow hover:opacity-95">Ver Online</a>
+      </nav>
     </div>
+  </header>
 
-    <aside class="card">
-      <h3>Visão Rápida</h3>
-      <p class="muted">Simulação local — os dados são salvos no armazenamento local do navegador.</p>
-      <div style="margin-top:12px">
-        <button class="small-btn" onclick="seedDemo()">Popular demo</button>
-        <button class="small-btn" style="background:var(--accent)" onclick="clearAll()">Limpar</button>
+  <main class="max-w-6xl mx-auto px-6 pb-16">
+    <!-- hero -->
+    <section class="grid md:grid-cols-2 gap-8 items-center">
+      <div data-aos="fade-up">
+        <h1 class="text-4xl font-extrabold leading-tight">
+          <span class="accent-grad">Organize</span> seu dia — termine o que importa
+        </h1>
+        <p class="mt-4 text-slate-600 text-lg">ToDo é um gerenciador de tarefas simples.</p>
+        <div class="mt-6 flex gap-3">
+          <button @click="document.getElementById('app').scrollIntoView({behavior:'smooth'})" class="px-4 py-2 rounded-md bg-white shadow text-indigo-700 font-semibold hover:scale-[1.02]">Experimentar agora</button>
+          <a href="#func" class="px-4 py-2 rounded-md border border-transparent bg-indigo-600 text-white hover:opacity-95">Ver funcionalidades</a>
+        </div>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-sm text-slate-600">
+          <div class="bg-white glass p-3 rounded-lg card text-center">
+            <div class="font-bold text-indigo-700 text-lg" id="statTotal">0</div>
+            <div>Total</div>
+          </div>
+          <div class="bg-white glass p-3 rounded-lg card text-center">
+            <div class="font-bold text-emerald-600 text-lg" id="statDone">0</div>
+            <div>Concluídas</div>
+          </div>
+          <div class="bg-white glass p-3 rounded-lg card text-center">
+            <div class="font-bold text-amber-500 text-lg" id="statPending">0</div>
+            <div>Pendentes</div>
+          </div>
+        </div>
       </div>
-      <hr style="margin:12px 0"/>
-      <h4>Instruções</h4>
-      <ol style="font-size:13px;color:var(--muted)">
-        <li>Preencha o título e clique em salvar.</li>
-        <li>Edite ou exclua usando os botões ao lado de cada tarefa.</li>
-        <li>Os dados são mantidos no navegador (localStorage).</li>
-      </ol>
-    </aside>
-  </section>
-</main>
 
-<footer id="contato">
-  <div style="max-width:800px;margin:0 auto">
-    <p>Projeto acadêmico — Sistema de Gerenciamento de Tarefas • Jefferson Lima</p>
-  </div>
-</footer>
+      <div class="p-6 rounded-xl card bg-white" data-aos="fade-left">
+        <!-- app mockup -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-lg font-semibold">Painel</div>
+          <div class="text-sm text-slate-500">Simulação local • Persistência com localStorage</div>
+        </div>
+
+        <div x-data="todoApp()" x-init="init()" class="space-y-4">
+          <!-- input -->
+          <div class="flex gap-3">
+            <input x-ref="title" x-model="newTitle" @keyup.enter="addTask()" class="flex-1 px-4 py-2 rounded-lg border" type="text" placeholder="Título da tarefa..." />
+            <button @click="addTask()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white">Adicionar</button>
+          </div>
+
+          <!-- filters -->
+          <div class="flex items-center gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <label class="text-slate-600">Filtro:</label>
+              <select x-model="filter" class="px-3 py-1 border rounded-md">
+                <option value="all">Todas</option>
+                <option value="pending">Pendentes</option>
+                <option value="done">Concluídas</option>
+              </select>
+            </div>
+
+            <div class="ml-auto flex items-center gap-3">
+              <button @click="seedDemo()" class="text-sm px-3 py-1 rounded-md border">Popular demo</button>
+              <button @click="clearAll()" class="text-sm px-3 py-1 rounded-md bg-red-50 text-red-600 border">Limpar</button>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <!-- tasks list -->
+            <div class="w-2/3 bg-slate-50 p-3 rounded-lg tasks-scroll" style="max-height:340px;overflow:auto">
+              <template x-for="(t,i) in filteredTasks()" :key="i">
+                <div class="flex items-start gap-3 p-3 rounded-md mb-2 bg-white card">
+                  <input type="checkbox" class="mt-1" :checked="t.done" @change="toggleDone(i)" />
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center gap-4">
+                      <div>
+                        <div x-text="t.title" class="font-semibold text-slate-800"></div>
+                        <div x-text="t.desc" class="text-sm text-slate-500"></div>
+                      </div>
+                      <div class="text-sm text-slate-400" x-text="t.due || 'sem prazo'"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button @click="editTask(i)" class="text-indigo-600 hover:text-indigo-800"><i class="fa-regular fa-pen-to-square"></i></button>
+                    <button @click="deleteTask(i)" class="text-red-600 hover:text-red-800"><i class="fa-regular fa-trash-can"></i></button>
+                  </div>
+                </div>
+              </template>
+              <div x-show="tasks.length === 0" class="text-center py-12 text-slate-400">Nenhuma tarefa cadastrada</div>
+            </div>
+
+            <!-- right column: chart + progress -->
+            <div class="w-1/3 space-y-4">
+              <div class="p-3 rounded-lg bg-white card text-center">
+                <canvas id="donutChart" width="200" height="200"></canvas>
+              </div>
+              <div class="p-3 rounded-lg bg-white card">
+                <div class="mb-3 text-slate-600">Progresso</div>
+                <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
+                  <div id="progressBar" class="h-4 rounded-full bg-gradient-to-r from-indigo-600 to-emerald-500" style="width:0%"></div>
+                </div>
+                <div class="mt-2 text-sm text-slate-500" x-text="progressText()"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- funcionalidades -->
+    <section id="func" class="mt-12" data-aos="fade-up">
+      <div class="bg-white p-6 rounded-lg card">
+        <h2 class="text-2xl font-bold mb-4">Funcionalidades</h2>
+        <ul class="grid md:grid-cols-3 gap-4 text-slate-600">
+          <li class="p-4 rounded-md bg-slate-50">Cadastrar tarefas (título, descrição, prazo)</li>
+          <li class="p-4 rounded-md bg-slate-50">Editar e excluir</li>
+          <li class="p-4 rounded-md bg-slate-50">Marcar como concluída</li>
+          <li class="p-4 rounded-md bg-slate-50">Filtros: Todas / Pendentes / Concluídas</li>
+          <li class="p-4 rounded-md bg-slate-50">Contador e gráfico (donut)</li>
+          <li class="p-4 rounded-md bg-slate-50">Persistência local (localStorage)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- demo / contact -->
+    <section id="demo" class="mt-10 grid md:grid-cols-2 gap-6">
+      <div class="bg-white p-6 rounded-lg card" data-aos="fade-right">
+        <h3 class="font-semibold mb-2">Como usar</h3>
+        <ol class="list-decimal list-inside text-slate-600">
+          <li>Adicione uma tarefa com título (pressione Enter para enviar).</li>
+          <li>Marque a checkbox para marcar como concluída.</li>
+          <li>Use o filtro para mostrar apenas pendentes ou concluídas.</li>
+          <li>Os dados são salvos automaticamente.</li>
+        </ol>
+      </div>
+      <div class="bg-white p-6 rounded-lg card" data-aos="fade-left">
+        <h3 class="font-semibold mb-2">Projeto</h3>
+        <p class="text-slate-600">Projeto acadêmico — Sistema de Gerenciamento de Tarefas</p>
+        <p class="text-sm text-slate-500 mt-4"><strong>Autores:</strong> Jefferson Rodrigues de Lima & Gabriella Alves Guajardo Cuevas</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="py-8">
+    <div class="max-w-6xl mx-auto px-6 text-center text-slate-500">
+      © 2025 — Projeto Acadêmico • Jefferson R. de Lima & Gabriella A. G. Cuevas
+    </div>
+  </footer>
 
 <script>
-  const tasksKey = 'todo_demo_tasks';
-  function loadTasks(){ try{ return JSON.parse(localStorage.getItem(tasksKey) || '[]') }catch(e){return[]}}
-  function persist(tasks){ localStorage.setItem(tasksKey, JSON.stringify(tasks)); renderTasks() }
-  function renderTasks(){
-    const container=document.getElementById('tasks'); container.innerHTML='';
-    const tasks = loadTasks();
-    if(tasks.length===0){ container.innerHTML='<p style="color:#666">Nenhuma tarefa cadastrada</p>'; return;}
-    tasks.forEach((t,i)=>{
-      const div=document.createElement('div'); div.className='task';
-      div.innerHTML = `<div><div class="meta"><strong>${escapeHtml(t.title)}</strong> • ${escapeHtml(t.due||'sem prazo')}</div><div style="font-size:13px;color:#555">${escapeHtml(t.desc||'')}</div></div>
-        <div>
-          <button class="small-btn" onclick="editTask(${i})">Editar</button>
-          <button class="small-btn" style="background:#ef4444" onclick="deleteTask(${i})">Excluir</button>
-        </div>`;
-      container.appendChild(div);
-    });
-  }
-  function saveTask(){
-    const title=document.getElementById('title').value.trim();
-    if(!title){ alert('Título obrigatório'); return false }
-    const desc=document.getElementById('desc').value.trim();
-    const due=document.getElementById('due').value;
-    const editing = document.getElementById('editingId').value;
-    const tasks = loadTasks();
-    if(editing===''){
-      tasks.push({title,desc,due});
-    } else {
-      tasks[Number(editing)] = {title,desc,due};
-      document.getElementById('editingId').value='';
+  AOS.init();
+
+  function todoApp() {
+    return {
+      tasks: [],
+      newTitle: '',
+      newDesc: '',
+      newDue: '',
+      filter: 'all',
+      chart: null,
+      init() {
+        // load from localStorage
+        const raw = localStorage.getItem('todo_uau_tasks');
+        try { this.tasks = raw ? JSON.parse(raw) : []; } catch(e){ this.tasks = []; }
+        this.renderStats();
+        this.initChart();
+      },
+      save() {
+        localStorage.setItem('todo_uau_tasks', JSON.stringify(this.tasks));
+        this.renderStats();
+      },
+      addTask() {
+        const title = this.newTitle && this.newTitle.trim();
+        if(!title) return;
+        this.tasks.push({ title: title, desc: this.newDesc || '', due: this.newDue || '', done: false });
+        this.newTitle=''; this.newDesc=''; this.newDue='';
+        this.save();
+        this.updateChart();
+      },
+      editTask(i) {
+        const t = this.tasks[i];
+        const newTitle = prompt('Editar título', t.title);
+        if(newTitle === null) return;
+        t.title = newTitle.trim() || t.title;
+        const newDesc = prompt('Editar descrição', t.desc);
+        if(newDesc !== null) t.desc = newDesc;
+        this.save();
+        this.updateChart();
+      },
+      deleteTask(i) {
+        if(!confirm('Excluir esta tarefa?')) return;
+        this.tasks.splice(i,1);
+        this.save();
+        this.updateChart();
+      },
+      toggleDone(i) {
+        this.tasks[i].done = !this.tasks[i].done;
+        this.save();
+        this.updateChart();
+      },
+      clearAll() { if(confirm('Limpar todas as tarefas?')){ this.tasks = []; this.save(); this.updateChart(); } },
+      seedDemo() {
+        this.tasks = [
+          {title:'Estudar Arduino', desc:'Ler capítulo 3 e montar circuito', due:'', done:false},
+          {title:'Implementar cadastro', desc:'Testar persistência', due:'', done:true},
+          {title:'Preparar apresentação', desc:'Slides e demonstrar site', due:'', done:false},
+        ];
+        this.save();
+        this.updateChart();
+      },
+      filteredTasks() {
+        if(this.filter === 'all') return this.tasks;
+        if(this.filter === 'pending') return this.tasks.filter(t => !t.done);
+        return this.tasks.filter(t => t.done);
+      },
+      renderStats() {
+        const total = this.tasks.length;
+        const done = this.tasks.filter(t => t.done).length;
+        const pending = total - done;
+        document.getElementById('statTotal').innerText = total;
+        document.getElementById('statDone').innerText = done;
+        document.getElementById('statPending').innerText = pending;
+        const pct = total === 0 ? 0 : Math.round((done/total)*100);
+        document.getElementById('progressBar').style.width = pct + '%';
+        if(this.chart) { this.chart.data.datasets[0].data = [done, pending]; this.chart.update(); }
+      },
+      progressText() {
+        const total = this.tasks.length;
+        const done = this.tasks.filter(t => t.done).length;
+        if(total === 0) return 'Sem tarefas ainda.';
+        return `${done} de ${total} tarefas concluídas (${Math.round((done/total)*100)}%)`;
+      },
+      initChart() {
+        const ctx = document.getElementById('donutChart').getContext('2d');
+        this.chart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Concluídas','Pendentes'],
+            datasets: [{
+              data: [0,1],
+              backgroundColor: ['#10B981','#F59E0B']
+            }]
+          },
+          options: {
+            plugins: { legend: { position: 'bottom' } },
+            maintainAspectRatio: false
+          }
+        });
+        this.updateChart();
+      },
+      updateChart() { this.renderStats(); }
     }
-    persist(tasks);
-    document.getElementById('taskForm').reset();
-    return false;
   }
-  function editTask(i){
-    const tasks=loadTasks(); const t=tasks[i];
-    document.getElementById('title').value=t.title;
-    document.getElementById('desc').value=t.desc;
-    document.getElementById('due').value=t.due;
-    document.getElementById('editingId').value = i;
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
-  function deleteTask(i){
-    if(!confirm('Confirmar exclusão da tarefa?')) return;
-    const tasks=loadTasks(); tasks.splice(i,1); persist(tasks);
-  }
-  function seedDemo(){ const demo=[{title:'Estudar Arduino',desc:'Ler capítulo 3 e montar circuito',due:''},{title:'Trabalhar no projeto',desc:'Implementar cadastro',due:''}]; persist(demo) }
-  function clearAll(){ if(confirm('Limpar todas as tarefas?')){ localStorage.removeItem(tasksKey); renderTasks(); } }
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])) }
-  renderTasks();
+
+  // small helper to auto-save when leaving page
+  window.addEventListener('beforeunload', () => {
+    const raw = localStorage.getItem('todo_uau_tasks');
+    // nothing special, data already saved by app on operations
+  });
 </script>
 </body>
 </html>
